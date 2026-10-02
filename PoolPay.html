@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoolPay - Committee Management System</title>
+    <style>
+        :root {
+            --bg-black: #0d0d0d;
+            --panel-black: #161616;
+            --card-black: #222222;
+            --input-bg: #2b2b2b;
+            --metallic-red: linear-gradient(135deg, #800000 0%, #cc0000 50%, #e60000 70%, #990000 100%);
+            --metallic-red-hover: linear-gradient(135deg, #990000 0%, #e60000 50%, #ff1a1a 70%, #b30000 100%);
+            --metallic-green: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #4caf50 100%);
+            --solid-red: #cc0000;
+            --bright-red: #ff4d4d;
+            --gold-accent: #ffd700;
+            --text-light: #f2f2f2;
+            --text-muted: #a0a0a0;
+            --border-color: #383838;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styling */
+        header {
+            background: var(--metallic-red);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bright-red);
+            box-shadow: 0 4px 20px rgba(204, 0, 0, 0.4);
+        }
+
+        header h1 {
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            text-transform: uppercase;
+        }
+
+        .user-status {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-logout {
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #000;
+            border-color: var(--bright-red);
+            color: var(--bright-red);
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1250px;
+            margin: 20px auto;
+            padding: 0 15px;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Login Portal Styling */
+        .login-box {
+            background: var(--panel-black);
+            max-width: 440px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--solid-red);
+            box-shadow: 0 0 25px rgba(204, 0, 0, 0.25);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--bright-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #d1d1d1;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 11px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: #fff;
+            outline: none;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--bright-red);
+        }
+
+        .btn-red {
+            background: var(--metallic-red);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-red:hover {
+            background: var(--metallic-red-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Panel Component Layout */
+        .panel {
+            background-color: var(--panel-black);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-title {
+            color: var(--bright-red);
+            border-bottom: 2px solid var(--solid-red);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media(max-width: 820px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Highlight Cards & Metrics */
+        .info-box {
+            background: var(--card-black);
+            border-left: 4px solid var(--solid-red);
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .admin-ref {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--bright-red);
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        /* Committee Card Styling */
+        .committee-card {
+            background-color: var(--card-black);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--solid-red);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .committee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            background: #1a1a1a;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid #2e2e2e;
+        }
+
+        .committee-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .pot-badge {
+            background: var(--gold-accent);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* Financial Metrics Grid */
+        .finance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .metric-card {
+            background: #181818;
+            border: 1px solid #333;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-card .val {
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .val-gold { color: var(--gold-accent); }
+        .val-green { color: #4caf50; }
+        .val-red { color: #ff5252; }
+
+        /* Tables Styling */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        table th, table td {
+            border: 1px solid #333;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        table th {
+            background: var(--metallic-red);
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: 600;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        table tr:hover {
+            background-color: #262626;
+        }
+
+        .blurred-phone {
+            filter: blur(4px);
+            user-select: none;
+            color: #888;
+        }
+
+        /* Badges & Action Buttons */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .bg-green { background-color: #1e7e34; color: #fff; }
+        .bg-red { background-color: #bd2130; color: #fff; }
+        .bg-gold { background-color: var(--gold-accent); color: #000; }
+
+        .btn-small {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-small:hover {
+            background: #444;
+            border-color: #777;
+        }
+
+        .btn-small-danger {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-small-danger:hover {
+            background-color: #e53935;
+        }
+
+        .btn-reset-cycle {
+            background: var(--metallic-green);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-reset-cycle:hover {
+            transform: scale(1.02);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Announcement Footer */
+        footer {
+            background: var(--metallic-red);
+            padding: 16px;
+            margin-top: auto;
+            border-top: 2px solid var(--bright-red);
+            box-shadow: 0 -4px 15px rgba(204, 0, 0, 0.4);
+        }
+
+        .announcement-box {
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--bright-red);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .announcement-title {
+            color: var(--bright-red);
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .announcement-content {
+            color: #fff;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>PoolPay</h1>
+        <div id="userHeader" class="user-status hidden">
+            <span>User: <strong id="currentUsername" style="color: var(--gold-accent);"></strong> (<span id="currentUserRole" style="color: #ffb3b3;"></span>)</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- LOGIN PORTAL VIEW -->
+        <div id="loginView" class="login-box">
+            <h2>PoolPay Portal Access</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Login As</label>
+                    <select id="loginType" onchange="toggleLoginFields()">
+                        <option value="admin">Admin</option>
+                        <option value="member">Member</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="adminUserGroup">
+                    <label>Select Admin ID</label>
+                    <select id="adminUserSelect"></select>
+                </div>
+
+                <div class="form-group hidden" id="memberUserGroup">
+                    <label>Member Name</label>
+                    <input type="text" id="memberUsernameInput" placeholder="Enter registered name">
+                </div>
+
+                <div class="form-group" id="passwordGroup">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+
+                <button type="submit" class="btn-red">Login to System</button>
+            </form>
+        </div>
+
+        <!-- MAIN DASHBOARD VIEW -->
+        <div id="dashboardView" class="hidden">
+            
+            <!-- Bank Account & Info Section -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Official Bank Account Details</span>
+                </div>
+                <div id="bankDetailsDisplay" class="info-box">
+                    <div id="bankText" style="white-space: pre-line; font-size: 15px;">No bank details posted.</div>
+                    <span id="bankRef" class="admin-ref"></span>
+                </div>
+                
+                <div id="bankAdminControls" class="hidden" style="margin-top: 12px;">
+                    <textarea id="bankInput" rows="3" placeholder="Enter Bank Name, Account Title, Account Number, Easypaisa/JazzCash..."></textarea>
+                    <button class="btn-small" onclick="updateBankDetails()" style="margin-top: 8px; background: var(--metallic-red); border:none; padding: 8px 16px;">Update Bank Account Info</button>
+                </div>
+            </div>
+
+            <!-- ADMIN CONTROLS PANEL -->
+            <div id="adminControls" class="hidden">
+                <div class="grid-2">
+                    <!-- Create New Committee Form -->
+                    <div class="panel">
+                        <h3 class="panel-title">Create Committee (Max 5)</h3>
+                        <form onsubmit="createCommittee(event)">
+                            <div class="form-group">
+                                <label>Committee Name</label>
+                                <input type="text" id="commName" required placeholder="e.g. Executive Savings Pool">
+                            </div>
+                            <div class="form-group">
+                                <label>Monthly Amount Per Member (PKR)</label>
+                                <input type="number" id="commMonthlyFee" min="100" value="10000" required placeholder="e.g. 10000">
+                            </div>
+                            <div class="form-group">
+                                <label>Target Members Limit (Max 20)</label>
+                                <input type="number" id="commLimit" max="20" min="1" value="12" required>
+                            </div>
+                            <button type="submit" class="btn-red">Start New Committee</button>
+                        </form>
+                    </div>
+
+                    <!-- Add Member to Committee Form -->
+                    <div class="panel">
+                        <h3 class="panel-title">Add Member to Committee</h3>
+                        <form onsubmit="addMember(event)">
+                            <div class="form-group">
+                                <label>Select Target Committee</label>
+                                <select id="commSelect" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Member Full Name</label>
+                                <input type="text" id="memberName" required placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Number</label>
+                                <input type="text" id="memberPhone" required placeholder="03001234567">
+                            </div>
+                            <div class="form-group">
+                                <label>Assigned Slot / Turn Month</label>
+                                <input type="number" id="memberSlot" min="1" max="20" value="1" required placeholder="e.g. 1 for Month 1">
+                            </div>
+                            <div class="form-group">
+                                <label>User Role (Grant Admin Access?)</label>
+                                <select id="newRoleSelect" onchange="toggleAdminPasswordRequirement()">
+                                    <option value="member">Normal Member</option>
+                                    <option value="admin">Admin (Full Access)</option>
+                                </select>
+                            </div>
+                            <div class="form-group hidden" id="adminPassReqGroup">
+                                <label>Set Password for new Admin</label>
+                                <input type="password" id="newAdminPassword" placeholder="Set secure password">
+                            </div>
+                            <button type="submit" class="btn-red">Add Member to List</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Admin Announcement Creator Panel -->
+                <div class="panel">
+                    <h3 class="panel-title">Post Official Admin Announcement Note</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="announcementInput" style="flex: 1; padding: 10px; background: var(--input-bg); color: white; border: 1px solid var(--border-color); border-radius: 6px; min-width: 250px;" placeholder="Write global announcement message for all members...">
+                        <button onclick="updateAnnouncement()" class="btn-red" style="width: auto; padding: 10px 24px;">Publish Note</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMITTEES LIST & MONTHLY FINANCIAL TRACKER -->
+            <div class="panel">
+                <h3 class="panel-title">Active Committees & Monthly Hisab</h3>
+                <div id="committeesList"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ANNOUNCEMENT FOOTER -->
+    <footer>
+        <div class="container" style="margin: 0 auto;">
+            <div class="announcement-box">
+                <div class="announcement-title">📢 OFFICIAL ADMINISTRATOR ANNOUNCEMENT</div>
+                <div class="announcement-content" id="displayAnnouncement">No active announcements posted.</div>
+                <span id="announcementRef" class="admin-ref" style="color: var(--gold-accent); font-size: 13px;"></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global System Data State
+        let state = JSON.parse(localStorage.getItem('poolpay_pro_v3_db')) || {
+            admins: {
+                "Rizwan": "admin123",
+                "Kher-Un-Nisa": "admin123"
+            },
+            bank: { text: "No official bank account details provided yet.", author: "" },
+            announcement: { text: "Welcome to PoolPay! Keep track of monthly committee payments and turns securely.", author: "System" },
+            committees: [] // No pre-filled demo data
+        };
+
+        let currentUser = null;
+
+        // Persist data to LocalStorage
+        function saveData() {
+            localStorage.setItem('poolpay_pro_v3_db', JSON.stringify(state));
+            render();
+        }
+
+        // Initialize Admin Select Box for Login
+        function initAdminDropdown() {
+            const select = document.getElementById('adminUserSelect');
+            select.innerHTML = '';
+            for(let adminName in state.admins) {
+                const opt = document.createElement('option');
+                opt.value = adminName;
+                opt.innerText = adminName;
+                select.appendChild(opt);
+            }
+        }
+        initAdminDropdown();
+
+        function toggleLoginFields() {
+            const type = document.getElementById('loginType').value;
+            if(type === 'admin') {
+                document.getElementById('adminUserGroup').classList.remove('hidden');
+                document.getElementById('memberUserGroup').classList.add('hidden');
+                document.getElementById('passwordGroup').classList.remove('hidden');
+            } else {
+                document.getElementById('adminUserGroup').classList.add('hidden');
+                document.getElementById('memberUserGroup').classList.remove('hidden');
+                document.getElementById('passwordGroup').classList.add('hidden');
+            }
+        }
+
+        function toggleAdminPasswordRequirement() {
+            const role = document.getElementById('newRoleSelect').value;
+            const reqGroup = document.getElementById('adminPassReqGroup');
+            if(role === 'admin') {
+                reqGroup.classList.remove('hidden');
+                document.getElementById('newAdminPassword').setAttribute('required', 'true');
+            } else {
+                reqGroup.classList.add('hidden');
+                document.getElementById('newAdminPassword').removeAttribute('required');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const type = document.getElementById('loginType').value;
+
+            if(type === 'admin') {
+                const user = document.getElementById('adminUserSelect').value;
+                const pass = document.getElementById('loginPassword').value;
+                if(state.admins[user] && state.admins[user] === pass) {
+                    currentUser = { name: user, role: 'admin' };
+                } else {
+                    alert('Incorrect Password for Admin ID!');
+                    return;
+                }
+            } else {
+                const username = document.getElementById('memberUsernameInput').value.trim();
+                if(!username) { alert('Please enter your Member Name'); return; }
+                
+                let found = false;
+                state.committees.forEach(c => {
+                    c.members.forEach(m => {
+                        if(m.name.toLowerCase() === username.toLowerCase()) found = true;
+                    });
+                });
+
+                if(found) {
+                    currentUser = { name: username, role: 'member' };
+                } else {
+                    alert('Member record not found! Please ask the Admin to add you first.');
+                    return;
+                }
+            }
+
+            // View Switching
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('userHeader').classList.remove('hidden');
+            
+            document.getElementById('currentUsername').innerText = currentUser.name;
+            document.getElementById('currentUserRole').innerText = currentUser.role.toUpperCase();
+            
+            document.getElementById('loginPassword').value = '';
+
+            if(currentUser.role === 'admin') {
+                document.getElementById('adminControls').classList.remove('hidden');
+                document.getElementById('bankAdminControls').classList.remove('hidden');
+            } else {
+                document.getElementById('adminControls').classList.add('hidden');
+                document.getElementById('bankAdminControls').classList.add('hidden');
+            }
+
+            render();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('userHeader').classList.add('hidden');
+        }
+
+        function updateBankDetails() {
+            const txt = document.getElementById('bankInput').value.trim();
+            if(!txt) return;
+            state.bank = { text: txt, author: currentUser.name };
+            document.getElementById('bankInput').value = '';
+            saveData();
+        }
+
+        function updateAnnouncement() {
+            const txt = document.getElementById('announcementInput').value.trim();
+            if(!txt) return;
+            state.announcement = { text: txt, author: currentUser.name };
+            document.getElementById('announcementInput').value = '';
+            saveData();
+        }
+
+        function createCommittee(e) {
+            e.preventDefault();
+            if(state.committees.length >= 5) {
+                alert('Limit Exceeded: Maximum 5 active committees allowed at a time.');
+                return;
+            }
+
+            const name = document.getElementById('commName').value.trim();
+            const monthlyFee = parseInt(document.getElementById('commMonthlyFee').value) || 0;
+            const limit = parseInt(document.getElementById('commLimit').value) || 12;
+
+            if(limit > 20) { alert('Limit cannot exceed 20 members per committee.'); return; }
+            if(monthlyFee <= 0) { alert('Please enter a valid monthly fee amount.'); return; }
+
+            state.committees.push({
+                id: Date.now(),
+                name: name,
+                monthlyFee: monthlyFee,
+                limit: limit,
+                currentMonth: 1,
+                members: []
+            });
+
+            document.getElementById('commName').value = '';
+            saveData();
+        }
+
+        function addMember(e) {
+            e.preventDefault();
+            const commId = parseInt(document.getElementById('commSelect').value);
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            const slot = parseInt(document.getElementById('memberSlot').value) || 1;
+            const role = document.getElementById('newRoleSelect').value;
+
+            const committee = state.committees.find(c => c.id === commId);
+            if(!committee) return;
+
+            if(committee.members.length >= committee.limit) {
+                alert(`Cannot add member. Committee target limit (${committee.limit}) reached!`);
+                return;
+            }
+
+            if(role === 'admin') {
+                const pass = document.getElementById('newAdminPassword').value;
+                if(!pass) { alert('Password is required for setting up a new Admin!'); return; }
+                state.admins[name] = pass;
+                initAdminDropdown();
+            }
+
+            committee.members.push({
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                slot: slot,
+                role: role,
+                paid: false
+            });
+
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPhone').value = '';
+            saveData();
+        }
+
+        function togglePaymentStatus(commId, memberId) {
+            const comm = state.committees.find(c => c.id === commId);
+            if(comm) {
+                const member = comm.members.find(m => m.id === memberId);
+                if(member) {
+                    member.paid = !member.paid;
+                    saveData();
+                }
+            }
+        }
+
+        function completeMonthlyCycle(commId) {
+            const comm = state.committees.find(c => c.id === commId);
+            if(!comm) return;
+
+            const currentRecipient = comm.members.find(m => m.slot === comm.currentMonth);
+            const recipientName = currentRecipient ? currentRecipient.name : `Turn ${comm.currentMonth} Candidate`;
+
+            if(confirm(`Confirm transfer of Month ${comm.currentMonth} payout pot to [ ${recipientName} ]?\n\nThis will automatically RESET all member payment statuses to Pending for Month ${comm.currentMonth + 1}.`)) {
+                // Reset all members payment flags for the new month
+                comm.members.forEach(m => m.paid = false);
+                // Increment Month
+                comm.currentMonth += 1;
+                saveData();
+            }
+        }
+
+        function deleteCommittee(id) {
+            if(confirm('Are you sure you want to delete this committee and all its data?')) {
+                state.committees = state.committees.filter(c => c.id !== id);
+                saveData();
+            }
+        }
+
+        function deleteMember(commId, memberId) {
+            if(confirm('Remove this member from the committee?')) {
+                const comm = state.committees.find(c => c.id === commId);
+                if(comm) {
+                    comm.members = comm.members.filter(m => m.id !== memberId);
+                    saveData();
+                }
+            }
+        }
+
+        function render() {
+            // Render Bank Details
+            document.getElementById('bankText').innerText = state.bank.text;
+            document.getElementById('bankRef').innerText = state.bank.author ? `- Posted/Updated by Admin: ${state.bank.author}` : '';
+
+            // Render Announcement
+            document.getElementById('displayAnnouncement').innerText = state.announcement.text;
+            document.getElementById('announcementRef').innerText = state.announcement.author !== "System" ? `— Posted by Admin: ${state.announcement.author}` : '';
+
+            // Populate Committee Select Options
+            const commSelect = document.getElementById('commSelect');
+            commSelect.innerHTML = '';
+            state.committees.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.innerText = `${c.name} (${c.members.length}/${c.limit} Members - PKR ${c.monthlyFee.toLocaleString()}/mo)`;
+                commSelect.appendChild(opt);
+            });
+
+            // Render Active Committees List
+            const list = document.getElementById('committeesList');
+            list.innerHTML = '';
+
+            if(state.committees.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 25px;">No active committees found. Create one above to get started.</p>';
+                return;
+            }
+
+            state.committees.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'committee-card';
+
+                // Calculations
+                const totalPotValue = c.monthlyFee * c.members.length;
+                const paidMembersCount = c.members.filter(m => m.paid).length;
+                const totalCollectedMonth = paidMembersCount * c.monthlyFee;
+                const totalPendingMonth = (c.members.length - paidMembersCount) * c.monthlyFee;
+
+                // Identify recipient of current month
+                const currentRecipient = c.members.find(m => m.slot === c.currentMonth);
+                const recipientText = currentRecipient ? currentRecipient.name : `Slot ${c.currentMonth} (Unassigned)`;
+
+                // Sort members by assigned turn / slot
+                const sortedMembers = [...c.members].sort((a, b) => a.slot - b.slot);
+
+                let membersRows = '';
+                sortedMembers.forEach((m, index) => {
+                    let displayPhone = m.phone;
+                    
+                    // PRIVACY CONTROL: Hide or Blur phone number unless it is the logged-in member
+                    if(currentUser && currentUser.role === 'member' && currentUser.name.toLowerCase() !== m.name.toLowerCase()) {
+                        displayPhone = `<span class="blurred-phone">03XX-XXXXXXX</span>`;
+                    }
+
+                    const paymentBadge = m.paid 
+                        ? `<span class="badge bg-green">Paid</span>` 
+                        : `<span class="badge bg-red">Pending</span>`;
+
+                    const isCurrentRecipient = (m.slot === c.currentMonth);
+                    const turnBadge = isCurrentRecipient 
+                        ? `<span class="badge bg-gold">Month ${m.slot} (This Month Recipient)</span>`
+                        : `<span class="badge" style="background:#333; color:#ccc;">Month ${m.slot}</span>`;
+
+                    let actionsHtml = '';
+                    if(currentUser && currentUser.role === 'admin') {
+                        const toggleBtnText = m.paid ? 'Mark Unpaid' : 'Mark Paid';
+                        actionsHtml = `
+                            <button class="btn-small" onclick="togglePaymentStatus(${c.id}, ${m.id})">${toggleBtnText}</button>
+                            <button class="btn-small-danger" onclick="deleteMember(${c.id}, ${m.id})">Del</button>
+                        `;
+                    } else {
+                        actionsHtml = '<span style="color:#777; font-size: 11px;">View Only</span>';
+                    }
+
+                    membersRows += `
+                        <tr style="${isCurrentRecipient ? 'background: rgba(255, 215, 0, 0.05);' : ''}">
+                            <td>${index + 1}</td>
+                            <td><strong>${m.name}</strong> ${m.role === 'admin' ? '<span style="color:var(--bright-red); font-size:10px;">(Admin)</span>' : ''}</td>
+                            <td>${displayPhone}</td>
+                            <td>${turnBadge}</td>
+                            <td>${paymentBadge}</td>
+                            <td>${actionsHtml}</td>
+                        </tr>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="committee-header">
+                        <div>
+                            <div class="committee-title">${c.name}</div>
+                            <span class="pot-badge">Total Pot Value: PKR ${totalPotValue.toLocaleString()}</span>
+                            <span style="font-size: 13px; color: #aaa; margin-left: 10px;">
+                                Monthly Fee: <strong>PKR ${c.monthlyFee.toLocaleString()}</strong> | Members: <strong>${c.members.length}/${c.limit}</strong>
+                            </span>
+                        </div>
+                        ${currentUser && currentUser.role === 'admin' ? `<button class="btn-small-danger" onclick="deleteCommittee(${c.id})" style="padding: 8px 12px;">Delete Committee</button>` : ''}
+                    </div>
+
+                    <!-- Financial Summary Tracker Grid -->
+                    <div class="finance-summary-grid">
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:var(--text-muted);">Current Cycle Month</div>
+                            <div class="val val-gold">Month ${c.currentMonth}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:var(--text-muted);">This Month Recipient</div>
+                            <div class="val" style="color: #fff;">${recipientText}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:var(--text-muted);">Collected This Month</div>
+                            <div class="val val-green">PKR ${totalCollectedMonth.toLocaleString()}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:var(--text-muted);">Pending This Month</div>
+                            <div class="val val-red">PKR ${totalPendingMonth.toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    ${currentUser && currentUser.role === 'admin' ? `
+                        <div style="margin-bottom: 12px; text-align: right;">
+                            <button class="btn-reset-cycle" onclick="completeMonthlyCycle(${c.id})">
+                                ✓ Mark Month ${c.currentMonth} Transferred & Reset for Month ${c.currentMonth + 1}
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    ${c.members.length > 0 ? `
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">#</th>
+                                        <th style="width: 25%;">Member Name</th>
+                                        <th style="width: 20%;">Contact Number</th>
+                                        <th style="width: 20%;">Turn / Schedule Slot</th>
+                                        <th style="width: 15%;">Monthly Status</th>
+                                        <th style="width: 15%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${membersRows}</tbody>
+                            </table>
+                        </div>
+                    ` : '<p style="font-size: 13px; color: #888; margin-top: 10px;">No members added to this committee yet.</p>'}
+                `;
+                list.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
